@@ -45,7 +45,7 @@ AI writes in uniform, predictable rhythms. Human writing is messy, varied, surpr
 - No section should exceed 300 words without a visual break (horizontal rule, new heading, or a one-sentence paragraph).
 
 **Punctuation:**
-- **Em-dash limit: maximum 2 per entire article.** This is a strict cap. Em-dash overuse is one of the strongest AI-writing signals. Use periods, commas, parentheses, colons, and semicolons instead.
+- **Em-dashes are fully banned. Zero allowed.** Never use — (em-dash) anywhere in the article. Use periods, commas, parentheses, colons, and semicolons instead. Em-dash overuse is one of the strongest AI-writing signals.
 - Mix punctuation types throughout. An article that only uses periods and commas reads flat.
 
 **Paragraph openings:**
