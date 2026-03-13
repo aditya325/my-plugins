@@ -1,0 +1,17 @@
+{
+  "name": "my-plugins",
+  "owner": {
+    "name": "Aditya Pasikanti"
+  },
+  "metadata": {
+    "description": "Personal Claude Code plugins for writing, learning, and productivity.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "learnings",
+      "source": "./learnings",
+      "description": "Blog creation skill with writing standards, anti-AI-tell rules, and human voice guidelines."
+    }
+  ]
+}
