@@ -1,6 +1,6 @@
 ---
 description: Assess what was built — validates output against requirements and reviews code quality. Use after /build to ensure correctness and code standards. Dispatches specialized subagents for thorough review.
-allowed-tools: Read, Grep, Glob, Task
+allowed-tools: Read, Write, Grep, Glob, Task
 ---
 
 # Assess — Output Validation & Code Review
@@ -8,23 +8,18 @@ allowed-tools: Read, Grep, Glob, Task
 You are entering the Assess phase. Your job is to thoroughly validate what was built — both that it works correctly AND that the code meets project standards. Do not fix anything yet. Only identify issues.
 
 ## Input
-What to assess: `$ARGUMENTS`
+Context or overrides: `$ARGUMENTS`
 
-If no context about what was built exists, ask the user what files or features to assess.
+## Artifact Resolution
+1. Look in `.buildspace/artifacts/` for feature folders containing `execution-log.md`
+2. If one folder exists → use it
+3. If multiple folders exist → ask the user which feature to assess
+4. If no execution-log.md found → ask the user what files or features to assess
 
-## Pre-Assessment Setup
-
-1. Read `CLAUDE.md` if it exists for project overview
-2. Re-read EVERY skill file listed below — even if loaded during `/plan` or `/build`. You need the full standards fresh to assess against:
-   - `liquid-standards` — Liquid variable naming, tag style, render vs include, whitespace control, filters
-   - `css-standards` — BEM naming, section scoping, property ordering, responsive breakpoints
-   - `section-standards` — Section file structure, wrapper patterns, block rendering via snippets
-   - `section-schema-standards` — Schema structure, setting IDs/labels, block conventions, presets
-   - `js-standards` — Vanilla JS only, defer loading, no inline styles/DOM creation/price formatting
-   - `theme-architecture` — File structure, naming conventions, when to create snippets
-3. Locate the execution plan from the conversation (if available)
-
-**If you cannot find or read a skill file, STOP and tell the user.**
+Read from `.buildspace/artifacts/{feature-name}/`:
+- `task-spec.md` — the requirements to validate against
+- `plan.md` — the approach that was planned
+- `execution-log.md` — what was built and which files were created/modified
 
 ## Assessment Process
 
@@ -33,14 +28,13 @@ Use the Task tool to dispatch the **output-validator** agent:
 
 > **Mission: Output Validation**
 >
-> Review the recently built/modified files and validate against the task requirements.
+> Read the task spec at: `.buildspace/artifacts/{feature-name}/task-spec.md`
+> Read the execution log at: `.buildspace/artifacts/{feature-name}/execution-log.md`
 >
-> **Task Requirements:** [paste the Task Spec or plan requirements]
->
-> **Files to review:** [list files that were created/modified]
+> Review the files listed in the execution log and validate against the task spec requirements.
 >
 > Check:
-> 1. Are ALL requirements from the plan implemented? List each requirement and whether it's met.
+> 1. Are ALL requirements from the task spec implemented? List each requirement and whether it's met.
 > 2. Are there any missing edge cases or error states not handled?
 > 3. Are there any obvious bugs or broken functionality?
 > 4. Does the implementation actually achieve the stated goal?
@@ -52,51 +46,49 @@ Use the Task tool to dispatch the **code-reviewer** agent:
 
 > **Mission: Code Review**
 >
-> Review the recently built/modified files against project coding standards.
+> Read the execution log at: `.buildspace/artifacts/{feature-name}/execution-log.md`
 >
-> **Project Standards to check against:**
-> [Paste relevant content from project skill files]
+> Review the files listed in the execution log against project coding standards.
+> For each file, load the relevant skill to know what standards apply:
+> - `.liquid` files → read `liquid-standards` skill
+> - Section `.liquid` files → also read `section-standards` + `section-schema-standards` skills
+> - `.css` files → read `css-standards` skill
+> - `.js` files → read `js-standards` skill
+> - If built from Figma → also read `figma-to-code` skill
 >
-> **Files to review:** [list files that were created/modified]
+> Use the checklist at the bottom of each skill file for validation.
 >
 > Review for:
-> 1. **Structure** — Is the code organized following project patterns?
+> 1. **Standards Compliance** — Does every file follow the relevant skill's rules and checklist?
 > 2. **Readability** — Can another developer understand this code easily?
 > 3. **Maintainability** — Is this easy to modify later? No tight coupling, no magic values?
 > 4. **Reusability** — Are there patterns that could be extracted? Or existing patterns that should have been reused?
-> 5. **Standards Compliance** — Does every file follow the project skill standards?
 >
-> For each issue found, report:
-> - File and location
-> - What the issue is
-> - Why it matters
-> - Severity: Critical / Should Fix / Nice to Have
->
-> Return a structured code review report.
+> For each issue found, report: file, location, what's wrong, which standard it violates, severity (Critical / Should Fix / Nice to Have).
 
 ### Compile Assessment Report
-After both agents return, compile the results:
+After both agents return, compile the results and write to `.buildspace/artifacts/{feature-name}/assessment.md`:
 
-```
-## Assessment Report
+```markdown
+# Assessment: {Feature Name}
 
-### Output Validation
+## Output Validation
 **Status:** [All Requirements Met / Issues Found]
 
 **Requirements Check:**
-- ✅ [Requirement] — Implemented correctly
-- ❌ [Requirement] — [What's wrong]
+- [Requirement] — Met / Partially met / Not implemented
+- [Requirement] — Met / Partially met / Not implemented
 
 **Bugs or Missing Functionality:**
 - [Issue description, or "None found"]
 
 ---
 
-### Code Review
+## Code Review
 **Status:** [Passes Standards / Issues Found]
 
 **Critical Issues (must fix):**
-- [Issue with file, location, and impact]
+- [Issue with file, location, standard violated, and impact]
 
 **Should Fix:**
 - [Issue with file, location, and impact]
@@ -106,12 +98,14 @@ After both agents return, compile the results:
 
 ---
 
-### Verdict
+## Verdict
 [One of:]
-- ✅ **Ready** — All requirements met, code passes standards. Run `/capture` to extract learnings from this task.
-- ⚠️ **Needs Work** — Issues found. Run `/fix` to address them, then run `/assess` again.
-- ❌ **Needs Rework** — Significant issues. Reiterate from `/plan` if approach needs changing, or `/build` if just implementation issues.
+- **Ready** — All requirements met, code passes standards. Run `/capture` to extract learnings.
+- **Needs Work** — Issues found. Run `/fix` to address them, then `/assess` again.
+- **Needs Rework** — Significant issues. Run `/plan` again if approach needs changing, or `/build` if just implementation issues.
 ```
+
+Present the assessment to the user and save it to the artifact folder.
 
 ## Rules
 - Never fix issues during assessment — only identify them
