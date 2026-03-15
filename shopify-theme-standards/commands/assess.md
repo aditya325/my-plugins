@@ -29,17 +29,18 @@ Use the Task tool to dispatch the **output-validator** agent:
 > **Mission: Output Validation**
 >
 > Read the task spec at: `.buildspace/artifacts/{feature-name}/task-spec.md`
+> Read the plan at: `.buildspace/artifacts/{feature-name}/plan.md`
 > Read the execution log at: `.buildspace/artifacts/{feature-name}/execution-log.md`
 >
-> Review the files listed in the execution log and validate against the task spec requirements.
+> The plan contains a **Test Cases** section with specific verification criteria. Run through every test case.
 >
 > Check:
-> 1. Are ALL requirements from the task spec implemented? List each requirement and whether it's met.
-> 2. Are there any missing edge cases or error states not handled?
-> 3. Are there any obvious bugs or broken functionality?
+> 1. Go through each test case in the plan's Test Cases section. For each one, read the relevant code and verify whether it passes or fails.
+> 2. Are ALL requirements from the task spec implemented? List each requirement and whether it's met.
+> 3. Are there any edge cases not covered by the test cases that you can identify?
 > 4. Does the implementation actually achieve the stated goal?
 >
-> Return a structured report of findings — what passes, what fails, what's missing.
+> Return a structured report: each test case with pass/fail status, then requirements check, then any additional findings.
 
 ### Assessment 2: Code Review
 Use the Task tool to dispatch the **code-reviewer** agent:
@@ -73,14 +74,17 @@ After both agents return, compile the results and write to `.buildspace/artifact
 # Assessment: {Feature Name}
 
 ## Output Validation
-**Status:** [All Requirements Met / Issues Found]
+**Status:** [All Tests Pass / Failures Found]
+
+**Test Cases (from plan):**
+- [ ] [Test case] — Pass / Fail [reason if fail]
+- [ ] [Test case] — Pass / Fail [reason if fail]
 
 **Requirements Check:**
 - [Requirement] — Met / Partially met / Not implemented
-- [Requirement] — Met / Partially met / Not implemented
 
-**Bugs or Missing Functionality:**
-- [Issue description, or "None found"]
+**Additional Issues:**
+- [Anything not covered by test cases, or "None found"]
 
 ---
 

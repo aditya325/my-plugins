@@ -24,18 +24,16 @@ If `design-context.md` exists in the same folder, read it for visual context.
 ### Step 1: Read Project Context
 Read `CLAUDE.md` if it exists for project overview and conventions.
 
-### Step 2: Research the Codebase
-Use the Task tool to dispatch an **Explore** subagent:
+### Step 2: Analyze the Codebase
+Use the Task tool to dispatch the **codebase-analyzer** agent:
 
-> Research the codebase to understand how to implement: [task description from task-spec]
+> **Mission: Codebase Analysis**
 >
-> Find:
-> 1. Existing files that will need to be modified or that relate to this task
-> 2. Existing patterns in the codebase that this task should follow
-> 3. Any dependencies, imports, or utilities already available that should be reused
-> 4. Potential conflicts or areas that might break
+> Analyze this Shopify theme codebase to inform planning for: [task description from task-spec]
 >
-> Return a structured summary of your findings.
+> Discover existing conventions, patterns, reusable snippets, schema patterns, CSS architecture, and potential conflicts. Read actual files — don't guess from filenames.
+>
+> Return a structured codebase analysis report.
 
 ### Step 3: Assess Knowledge Gaps
 Based on the task spec and codebase research, check if there are Shopify-specific topics you are not confident about — unfamiliar APIs, Liquid tags, platform behaviors, or patterns you haven't seen before.
@@ -87,8 +85,33 @@ Each TODO must be specific enough to execute without ambiguity.
 ### Risks & Considerations
 - [Anything that could go wrong or needs careful attention]
 
-### Validation Checks
-- [How to verify each part works correctly after building]
+### Test Cases
+Verification criteria for `/assess` to validate after build. Derive these from the task spec requirements AND the implementation details above.
+
+#### Rendering
+- [ ] [Section/component renders with all settings populated]
+- [ ] [Section/component renders with all settings empty — no broken markup]
+- [ ] [Each block type renders correctly in isolation]
+
+#### Edge Cases
+- [ ] [Missing image shows fallback or hides element — not broken <img>]
+- [ ] [Empty text settings don't output empty HTML tags]
+- [ ] [Section works with 0 blocks]
+- [ ] [Section works with max blocks]
+- [ ] [Feature-specific edge cases derived from requirements]
+
+#### Responsive
+- [ ] [Mobile layout matches spec at 360px]
+- [ ] [Desktop layout matches spec at 1280px]
+- [ ] [Breakpoint transitions are smooth — no layout breaks]
+
+#### Theme Editor
+- [ ] [All settings appear in editor with correct labels]
+- [ ] [Changing a setting updates the preview]
+- [ ] [Adding/removing/reordering blocks works in editor]
+- [ ] [Section can be added via "Add section" menu (preset exists)]
+
+Tailor these to the specific feature. Remove irrelevant checks, add feature-specific ones. Every test case should be verifiable by reading the code or inspecting in the theme editor.
 ```
 
 ### Step 5: Validate the Plan
