@@ -1,6 +1,6 @@
 ---
 description: Clarify requirements before starting any task. Use this as the first step before planning or building anything.
-allowed-tools: Read, Write, Grep, Glob
+allowed-tools: Read, Write
 ---
 
 # Clarify — Requirement Extraction
@@ -31,7 +31,7 @@ Break the request into:
 
 ### Step 3: Check Existing Context
 - Read `CLAUDE.md` if it exists for project context
-- Scan the codebase briefly to understand what already exists that relates to this request
+- If `design-context.md` exists in the artifact folder, use it for visual context
 
 ### Step 4: Ask Clarifying Questions
 Present your understanding back to the user:

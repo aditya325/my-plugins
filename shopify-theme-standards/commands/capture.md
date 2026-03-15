@@ -18,7 +18,7 @@ Context or overrides: `$ARGUMENTS`
    - `execution-log.md` — what was built
    - `assessment.md` — what issues were found (if any)
 
-If no context, review the current conversation for the task that was just completed.
+If no artifacts found, ask the user which feature to capture learnings from. Do not fall back to conversation context — artifacts are the source of truth.
 
 ## Process
 
