@@ -12,6 +12,11 @@
       "name": "learnings",
       "source": "./learnings",
       "description": "Blog creation skill with writing standards, anti-AI-tell rules, and human voice guidelines."
+    },
+    {
+      "name": "shopify-theme-standards",
+      "source": "./shopify-theme-standards",
+      "description": "Liquid, CSS, JS, schema, and section standards for Shopify themes"
     }
   ]
 }
