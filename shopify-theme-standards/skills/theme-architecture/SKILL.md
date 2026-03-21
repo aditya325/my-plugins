@@ -7,8 +7,6 @@ description: >
   layout files. Also use when the user asks about project organization, file naming, or where
   something should go in the theme. Covers directory layout, kebab-case naming, snippet extraction
   criteria, section independence, and Online Store 2.0 patterns.
-user-invocable: true
-globs: ["templates/**/*.json", "layout/**/*.liquid", "config/*.json"]
 ---
 
 # Theme Architecture

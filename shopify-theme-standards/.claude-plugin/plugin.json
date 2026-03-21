@@ -1,7 +1,7 @@
 {
   "name": "shopify-theme-standards",
-  "description": "Skills, commands, and agents for Shopify theme development. Uses artifact-based handshaking for efficient context management. Each stage reads from and writes to structured artifacts, loading only the skills relevant to the current file.",
-  "version": "2.0.0",
+  "description": "Skills, commands, and agents for Shopify theme development. Enforces Liquid, CSS, JS, schema, and section standards through a clarify → plan → build → assess → fix → capture workflow.",
+  "version": "1.0.8",
   "author": {
     "name": "Aditya Pasikanti"
   }

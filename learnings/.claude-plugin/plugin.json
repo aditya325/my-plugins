@@ -1,8 +1,0 @@
-{
-  "name": "learnings",
-  "description": "Blog creation skill with writing standards that produce human-sounding, opinionated articles. Enforces anti-AI-tell rules, burstiness, and honest voice.",
-  "version": "1.0.0",
-  "author": {
-    "name": "Aditya Pasikanti"
-  }
-}

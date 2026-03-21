@@ -5,8 +5,6 @@ description: >
   reviewing, or generating any section .liquid file, including when converting designs into sections
   or refactoring existing section code. Covers file ordering (CSS/HTML/JS/Schema), section wrappers,
   block rendering via snippets, case/when patterns, and section independence.
-user-invocable: true
-globs: ["sections/**/*.liquid"]
 ---
 
 # Section Patterns
