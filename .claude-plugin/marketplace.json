@@ -12,6 +12,11 @@
       "name": "shopify-theme-standards",
       "source": "./plugins/shopify-theme-standards",
       "description": "Liquid, CSS, JS, schema, and section standards for Shopify themes"
+    },
+    {
+      "name": "skill-toolkit",
+      "source": "./plugins/skill-toolkit",
+      "description": "Create and validate Claude Code skills. Includes an interactive skill creator and a multi-phase skill validator with mechanical checks and LLM-powered quality analysis."
     }
   ]
 }
