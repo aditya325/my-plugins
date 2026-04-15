@@ -5,6 +5,16 @@
 **Depends on:** {list of phase numbers with titles, or "None — can start immediately"}
 **Estimated scope:** {Small (1-3 files) / Medium (4-7 files) / Large (8+ files)}
 
+## Design Reference
+
+<!-- Include this section ONLY when a Figma design exists for this phase. Omit entirely otherwise. -->
+
+- **Desktop:** {Figma URL for the desktop frame}
+- **Mobile:** {Figma URL for the mobile frame, or "Same file as desktop"}
+- **Frames:** {Which sections/frames in the Figma file correspond to this phase}
+
+> Run `/figma` with these URLs before running `/clarify` for this PRD.
+
 ## Context
 
 {2-4 sentences. What state the project is in when a developer picks this up.

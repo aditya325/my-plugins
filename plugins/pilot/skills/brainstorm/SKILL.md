@@ -10,7 +10,7 @@ description: >
   "brainstorm", "break this down", "create a roadmap", "plan this project",
   or "decompose into phases".
 disable-model-invocation: true
-allowed-tools: Read, Write, Glob, Grep, AskUserQuestion, WebSearch, WebFetch, Agent, TaskCreate, TaskUpdate, TaskList
+allowed-tools: Read, Write, Bash, Glob, Grep, AskUserQuestion, WebSearch, WebFetch, Agent, TaskCreate, TaskUpdate, TaskList
 ---
 
 # Brainstorm — Project Decomposition into Phases & PRDs
@@ -41,7 +41,13 @@ The project brief: `$ARGUMENTS`
    - `Glob('src/**')` or similar — what's already built
    - Only scan if a codebase exists. If this is a greenfield project, skip.
 
-4. Identify what you know and what you don't. Separate:
+4. Check for design assets:
+   - If the developer mentions Figma, designs, or mockups, ask for the Figma file URL(s) upfront
+   - Ask which pages/frames in the file correspond to which parts of the project
+   - Track this mapping — it will be embedded in the PRDs for phases that have designs
+   - Not every phase will have a design. Backend work, config, infrastructure phases won't.
+
+5. Identify what you know and what you don't. Separate:
    - **Clear from the brief** — stated goals, constraints, tech choices
    - **Implied** — obvious requirements not explicitly mentioned
    - **Unknown** — things you need to explore before you can decompose
@@ -162,6 +168,7 @@ Once the tree, nesting, and execution order are all confirmed:
 3. For each leaf node, in execution order:
    - Read the PRD template from `${CLAUDE_SKILL_DIR}/templates/prd-template.md`
    - Fill it in with the specific context for that leaf node
+   - **Design Reference** — if this phase has a corresponding Figma design (from the mapping captured in Step 1), include the Figma URLs and frame references. If no design exists for this phase, omit the Design Reference section entirely.
    - The **Context** section is critical — it must describe what exists when this phase starts, referencing prior phases by their file paths
    - The **Approach** section must be specific — name technologies, patterns, architectural direction
    - The **Acceptance Criteria** must be verifiable — a developer can check each item off
@@ -226,6 +233,12 @@ Start here: docs/roadmap/{path-to-first-prd}
 Hand each PRD to your development pipeline one at a time, following the
 execution order in README.md. Each PRD is self-contained — it has full
 context, requirements, approach, and acceptance criteria.
+
+For PRDs with a Design Reference section:
+  /figma [URLs from the PRD] → /clarify [PRD path] → /plan → /execute → /compare → /assess
+
+For PRDs without a design:
+  /clarify [PRD path] → /plan → /execute → /assess
 ```
 
 **Do NOT output PRD contents in conversation. The files are the source of truth.**
