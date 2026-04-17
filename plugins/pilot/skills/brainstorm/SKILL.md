@@ -9,7 +9,6 @@ description: >
   a project idea and wants it decomposed into buildable units, or says
   "brainstorm", "break this down", "create a roadmap", "plan this project",
   or "decompose into phases".
-disable-model-invocation: true
 allowed-tools: Read, Write, Bash, Glob, Grep, AskUserQuestion, WebSearch, WebFetch, Agent, TaskCreate, TaskUpdate, TaskList
 ---
 
