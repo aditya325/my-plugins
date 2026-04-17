@@ -11,13 +11,13 @@ A Claude Code plugin for orchestrated Shopify theme development. Supports featur
 Inside Claude Code, run:
 
 ```
-/plugin marketplace add shopify-claude-devx/shopify-standards-marketplace
+/plugin marketplace add aditya325/my-plugins
 ```
 
 ### Step 2: Install the Plugin
 
 ```
-/plugin install shopify-theme-toolkit@shopify-standards
+/plugin install shopify-theme-toolkit@my-plugins
 ```
 
 ### Step 3: Verify
@@ -34,15 +34,18 @@ Restart Claude Code and type `/shopify-theme-toolkit:clarify` — if it responds
 
 Start with `/figma` when building from a Figma design. Skip it if working from text requirements only.
 
+`/assess` automatically runs Playwright-based runtime tests (section rendering, JS errors, accessibility, setting wiring) when `shopify theme dev` is running.
+
 ### Standalone Commands
 
 ```
-/figma       — Extract design context from Figma (via MCP)
-/fix         — Bug fixing with first-principles Root Cause Analysis
-/assess      — First-principles verification against requirements and standards
-/compare     — Visual comparison of code vs Figma screenshots
-/research    — Shopify topic research
-/understand  — Deep code explanation
+/figma         — Extract design context from Figma (via MCP)
+/fix           — Bug fixing with first-principles Root Cause Analysis
+/assess        — First-principles verification against requirements and standards
+/runtime-test  — Playwright runtime tests (also dispatched by /assess)
+/compare       — Visual comparison of code vs Figma screenshots
+/research      — Shopify topic research
+/understand    — Deep code explanation
 ```
 
 ### Use Cases
@@ -52,7 +55,8 @@ Start with `/figma` when building from a Figma design. Skip it if working from t
 | Figma → Feature | `/figma` | /figma → /clarify → /plan → /execute → /compare → /assess → /fix |
 | Feature Development | `/clarify` | /clarify → /plan → /execute → /assess → /fix |
 | Bug Fixing | `/fix` | standalone with first-principles RCA |
-| Assessment | `/assess` | standalone or after /execute |
+| Assessment | `/assess` | standalone or after /execute (includes runtime tests) |
+| Runtime Testing | `/runtime-test` | standalone or auto-dispatched by /assess |
 | Visual Comparison | `/compare` | after /execute when Figma screenshots exist |
 | Research | `/research` | standalone web search |
 | Understand Code | `/understand` | standalone deep trace |
@@ -68,7 +72,8 @@ Start with `/figma` when building from a Figma design. Skip it if working from t
 | `/plan` | Technical specification with per-file decisions | `clarify.md` | `plan.md` |
 | `/execute` | Build all files in-context with full visibility | `plan.md` | code files + `execution-log.md` |
 | `/compare` | Visual comparison of code vs Figma screenshots | `selectors.json` + Figma screenshots | `comparison-report.md` |
-| `/assess` | First-principles verification (requirements + standards + integration) | `execution-log.md` + `clarify.md` | `assessment-report.md` |
+| `/assess` | First-principles verification (requirements + standards + integration + runtime) | `execution-log.md` + `clarify.md` | `assessment-report.md` |
+| `/runtime-test` | Playwright runtime tests — DOM rendering, JS errors, accessibility, setting wiring | `execution-log.md` + `selectors.json` | `runtime-test-results.md` |
 | `/fix` | First-principles RCA + fix all instances (waits for approval) | `assessment-report.md` or bug report | `fix-log.md` |
 | `/understand` | Deep code explanation | file/section/feature name | conversation output |
 | `/research` | Shopify topic research | topic query | conversation output |
@@ -106,6 +111,9 @@ Start with `/figma` when building from a Figma design. Skip it if working from t
       plan.md                <- /plan output
       execution-log.md       <- /execute output
       selectors.json         <- /execute output (section->CSS selector map)
+      runtime-tests.spec.js  <- /runtime-test output (Playwright test script)
+      playwright.config.js   <- /runtime-test output (Playwright config)
+      runtime-test-results.md <- /runtime-test output
       screenshots/           <- /figma + /compare output
         figma-{section}-desktop.png
         figma-{section}-mobile.png
@@ -175,3 +183,5 @@ Requires Shopify CLI installed (`npm install -g @shopify/cli`).
 | Figma Pro+ plan | For /figma skill | Free plan = 6 calls/month; Pro = 200/day |
 | Shopify CLI | For theme check hook | `npm install -g @shopify/cli` |
 | Node.js 18+ | For screenshot capture | nodejs.org |
+| Playwright | For /runtime-test | Auto-installed by the skill if missing |
+| shopify theme dev | For /runtime-test | Must be running during runtime tests |
