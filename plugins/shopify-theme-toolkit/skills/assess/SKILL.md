@@ -6,7 +6,7 @@ description: >
   Reports findings and stops — no auto-fix. Use after /execute.
 disable-model-invocation: true
 context: fork
-allowed-tools: Read, Write, Grep, Glob, Bash, Agent
+allowed-tools: Read, Write, Grep, Glob, Bash, Agent, AskUserQuestion
 ---
 
 # Assess — First-Principles Verification
@@ -111,7 +111,45 @@ After both agents return, check integration directly with `Grep` and `Glob`:
 - **Snippet wiring:** `Grep('render "{snippet-name}"', glob='sections/*.liquid')` — are snippets referenced?
 - **Asset existence:** `Glob('assets/{filename}')` — do all referenced CSS/JS files exist on disk?
 
-### Step 5 — First-Principles Questions
+### Step 5 — Runtime Testing
+
+Dispatch a **runtime testing** agent:
+
+```
+Run runtime tests for feature: {feature-name}
+
+Feature artifacts: .buildspace/artifacts/{feature-name}/
+Files from execution-log: [list files]
+Selectors: .buildspace/artifacts/{feature-name}/selectors.json (if exists)
+
+Follow the runtime-test skill process:
+1. Pre-flight: ensure Playwright is installed (install if missing — do not ask).
+   Detect shopify theme dev — try http://localhost:9292 first. If no response,
+   ask the user if it's running and for the preview URL.
+2. Determine which page URL has the new section(s) by checking templates/*.json.
+   For index.json use "/". For product/collection/page templates, ask the user
+   for a specific URL.
+3. Analyze each section file: read schema (settings, blocks), Liquid (wrapper
+   selector, setting-to-DOM mapping), and template JSON (section key, current values).
+4. Generate a Playwright test script covering:
+   - Section renders on page (wrapper selector visible)
+   - No JavaScript console errors on page load
+   - Accessibility scan (axe-core) scoped to the section
+   - Setting-to-DOM wiring for each text-outputting setting
+   - Empty state (blank all text settings, verify no broken HTML)
+   - Block rendering (if section has blocks)
+5. Execute tests: npx playwright test --config=.buildspace/artifacts/{feature-name}/playwright.config.js
+6. Write results to .buildspace/artifacts/{feature-name}/runtime-test-results.md
+7. Generate a manual test checklist for non-automatable scenarios (theme customizer,
+   visual/responsive, edge cases) and append to the results file.
+8. Always restore template JSON files to their original state after testing.
+
+If shopify theme dev is not running, skip automated tests and generate only the manual test checklist.
+```
+
+Read `.buildspace/artifacts/{feature-name}/runtime-test-results.md` when the agent returns.
+
+### Step 6 — First-Principles Questions
 
 Think about the built feature from first principles. Ask yourself context-appropriate questions like:
 
@@ -135,6 +173,7 @@ Read the template from `${CLAUDE_SKILL_DIR}/templates/assessment-report-template
 
 Combine the output-validator's findings into the Requirements Coverage section.
 Combine the code-reviewer's findings into the Standards Compliance section.
+Combine the runtime-test results into the Runtime Testing section.
 Add your own integration and first-principles findings.
 
 Tell the user:

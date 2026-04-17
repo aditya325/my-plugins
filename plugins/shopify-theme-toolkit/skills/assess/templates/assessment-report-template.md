@@ -42,6 +42,16 @@
 - **Snippet wiring:** {all correct / issues}
 - **Asset files:** {all exist / missing}
 
+## Runtime Testing
+- **Status:** {Ran / Skipped — reason}
+- **Automated:** {passed}/{total} passed, {failed} failed
+- **Accessibility (axe-core):** {PASS — no violations / FAIL — {count} violations / SKIPPED}
+- **Setting Wiring:** {all settings render correctly / {list of failures}}
+- **Empty State:** {PASS — no broken HTML / FAIL — {details}}
+- **Blocks:** {PASS / FAIL / N/A — no blocks in schema}
+- **JS Errors:** {none detected / {error list}}
+- **Manual Tests:** {count} scenarios to verify manually → see `runtime-test-results.md`
+
 ## First-Principles Findings
 - {Any concerns from first-principles thinking}
 
