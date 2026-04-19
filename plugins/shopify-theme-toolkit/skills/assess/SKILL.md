@@ -5,8 +5,7 @@ description: >
   coverage, standards compliance, integration correctness, and edge cases.
   Reports findings and stops — no auto-fix. Use after /execute.
 disable-model-invocation: true
-context: fork
-allowed-tools: Read, Write, Grep, Glob, Bash, Agent, AskUserQuestion
+allowed-tools: Read, Write, Grep, Glob, Bash, Agent, Skill, AskUserQuestion
 ---
 
 # Assess — First-Principles Verification
@@ -14,6 +13,12 @@ allowed-tools: Read, Write, Grep, Glob, Bash, Agent, AskUserQuestion
 You are entering the Assess phase. Your job is to verify that what was built is correct, complete, and follows standards. Think from first principles — don't just pattern-match against checklists. Understand WHY each requirement exists and whether the implementation actually satisfies it.
 
 **Report findings and stop. Do not fix anything. Do not loop.**
+
+## CRITICAL: You MUST Dispatch Subagents
+
+Steps 2, 3, and 5 below are **not optional** and **not inlineable**. You MUST call the `Agent` tool with the specified `subagent_type` for each one. Do NOT perform these checks yourself by reading files inline — the whole point is to keep their output out of the main context and to use the specialist's system prompt.
+
+If you find yourself about to run `Read` / `Grep` to check requirements coverage, code standards, or runtime behavior — stop. That work belongs to the dispatched agent. Your job is to orchestrate the agents, aggregate their findings, and write the report.
 
 ## Input
 Context or overrides: `$ARGUMENTS`
@@ -58,14 +63,14 @@ else { console.log('No schema found'); }
 
 Report any failures.
 
-### Step 2 — Requirements Assessment
+### Step 2 — Requirements Assessment (MUST dispatch subagent)
 
-Dispatch the **output-validator** agent:
+Call the `Agent` tool with `subagent_type: "output-validator"` and the `description: "Requirements validation"`. Pass the following as the `prompt`:
 
 ```
 Validate feature: {feature-name}
 
-Files: [list from execution-log]
+Files: [list exact paths from execution-log]
 Requirements: .buildspace/artifacts/{feature-name}/clarify.md (if exists)
 Plan: .buildspace/artifacts/{feature-name}/plan.md (if exists)
 
@@ -78,29 +83,38 @@ Check every file for:
 6. Conditional display works (blank settings hide elements)
 7. Schema settings correctly wired to Liquid output
 
-If requirements exist: verify each requirement — Met / Partially met / Not implemented
-If plan exists: run each test case — Pass / Fail with reason
+If requirements exist: verify each requirement — Met / Partially met / Not implemented.
+If plan exists: run each test case — Pass / Fail with reason.
+
+Return a structured report with sections: Requirements Coverage, Edge Cases, Null/Blank Guards, Block Rendering, Image/Link Validation. Include file:line references for every finding.
 ```
 
-### Step 3 — Standards Assessment
+Wait for the agent to return before moving to Step 3. Store its output verbatim — it becomes the Requirements Coverage section of the report.
 
-Dispatch the **code-reviewer** agent:
+### Step 3 — Standards Assessment (MUST dispatch subagent)
+
+Call the `Agent` tool with `subagent_type: "code-reviewer"` and `description: "Standards review"`. Pass the following as the `prompt`:
 
 ```
-Review these files: [list from execution-log]
+Review these files: [list exact paths from execution-log]
 
 Execution log: .buildspace/artifacts/{feature-name}/execution-log.md
 
-For each file, validate against the relevant skill checklist.
+For each file, validate against the relevant skill checklist (liquid-standards, css-standards, js-standards, section-standards as applicable).
 Check standards compliance, readability, maintainability.
 Report issues with severity: Critical / Should Fix / Nice to Have.
+Include file:line references for every issue.
 
 Also check cross-file concerns:
 - Unused snippets (created but never rendered)
 - CSS class conflicts with existing files
 - Schema ID collisions across sections
 - Orphaned assets (CSS/JS not loaded anywhere)
+
+Return a structured report grouped by file, followed by the cross-file section.
 ```
+
+Wait for the agent to return. Its output becomes the Standards Compliance section of the report.
 
 ### Step 4 — Integration Assessment
 
@@ -111,26 +125,29 @@ After both agents return, check integration directly with `Grep` and `Glob`:
 - **Snippet wiring:** `Grep('render "{snippet-name}"', glob='sections/*.liquid')` — are snippets referenced?
 - **Asset existence:** `Glob('assets/{filename}')` — do all referenced CSS/JS files exist on disk?
 
-### Step 5 — Runtime Testing
+### Step 5 — Runtime Testing (MUST dispatch subagent)
 
-Dispatch a **runtime testing** agent:
+There is no dedicated runtime-testing subagent. Dispatch the built-in `general-purpose` agent and point it at the `runtime-test` skill inside this plugin. Call the `Agent` tool with `subagent_type: "general-purpose"` and `description: "Runtime testing"`. Pass the following as the `prompt`:
 
 ```
 Run runtime tests for feature: {feature-name}
 
-Feature artifacts: .buildspace/artifacts/{feature-name}/
-Files from execution-log: [list files]
-Selectors: .buildspace/artifacts/{feature-name}/selectors.json (if exists)
+Read and follow the runtime-test skill at:
+${CLAUDE_SKILL_DIR}/../runtime-test/SKILL.md
 
-Follow the runtime-test skill process:
-1. Pre-flight: ensure Playwright is installed (install if missing — do not ask).
-   Detect shopify theme dev — try http://localhost:9292 first. If no response,
-   ask the user if it's running and for the preview URL.
-2. Determine which page URL has the new section(s) by checking templates/*.json.
-   For index.json use "/". For product/collection/page templates, ask the user
-   for a specific URL.
-3. Analyze each section file: read schema (settings, blocks), Liquid (wrapper
-   selector, setting-to-DOM mapping), and template JSON (section key, current values).
+Inputs:
+- Feature artifacts dir: .buildspace/artifacts/{feature-name}/
+- Files from execution-log: [list exact paths]
+- Selectors hint: .buildspace/artifacts/{feature-name}/selectors.json (if exists)
+
+Required process (follow the skill verbatim):
+1. Pre-flight — ensure Playwright is installed (install if missing; do not ask).
+   Detect shopify theme dev at http://localhost:9292. If no response, ask the
+   user whether it's running and for the preview URL.
+2. Determine which page URL exercises the new section(s) by reading templates/*.json.
+   For index.json use "/". For product/collection/page templates, ask the user.
+3. Analyze each section file: schema (settings, blocks), Liquid (wrapper selector,
+   setting-to-DOM mapping), template JSON (section key, current values).
 4. Generate a Playwright test script covering:
    - Section renders on page (wrapper selector visible)
    - No JavaScript console errors on page load
@@ -138,16 +155,18 @@ Follow the runtime-test skill process:
    - Setting-to-DOM wiring for each text-outputting setting
    - Empty state (blank all text settings, verify no broken HTML)
    - Block rendering (if section has blocks)
-5. Execute tests: npx playwright test --config=.buildspace/artifacts/{feature-name}/playwright.config.js
+5. Execute: npx playwright test --config=.buildspace/artifacts/{feature-name}/playwright.config.js
 6. Write results to .buildspace/artifacts/{feature-name}/runtime-test-results.md
-7. Generate a manual test checklist for non-automatable scenarios (theme customizer,
-   visual/responsive, edge cases) and append to the results file.
+7. Append a manual test checklist for non-automatable scenarios (theme customizer,
+   visual/responsive, edge cases) to that file.
 8. Always restore template JSON files to their original state after testing.
 
-If shopify theme dev is not running, skip automated tests and generate only the manual test checklist.
+If shopify theme dev is not reachable, skip automated tests and generate only
+the manual test checklist. Return a summary of results and the path to the
+results file.
 ```
 
-Read `.buildspace/artifacts/{feature-name}/runtime-test-results.md` when the agent returns.
+When the agent returns, read `.buildspace/artifacts/{feature-name}/runtime-test-results.md` so you can fold its contents into the final assessment report.
 
 ### Step 6 — First-Principles Questions
 
@@ -225,6 +244,7 @@ If verdict is **NEEDS WORK**:
 ---
 
 ## Rules
+- **Always dispatch subagents for Steps 2, 3, 5** — use the `Agent` tool with the exact `subagent_type` specified. Never inline this work by reading files yourself.
 - **Never fix issues during assessment** — only identify and report them
 - **Think from first principles** — don't just check boxes. Ask "would this actually work?"
 - **Be honest** — if the code works, say PASS. Don't invent issues. Don't soften real issues.
