@@ -4,6 +4,7 @@ description: >
   Execute a plan by building all files in-context. Reads the plan,
   loads relevant standards, and builds everything with full visibility
   across files. Use after /plan when the specification is confirmed.
+disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Skill, TaskCreate, TaskUpdate, TaskList
 ---
 

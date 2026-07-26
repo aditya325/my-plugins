@@ -4,6 +4,7 @@ description: >
   Debug and fix issues using first-principles thinking. Investigates the codebase,
   performs root cause analysis, proposes the fix for user approval, then executes.
   Never patches symptoms — always fixes the underlying cause.
+disable-model-invocation: true
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Skill, WebSearch, WebFetch, AskUserQuestion
 ---
 

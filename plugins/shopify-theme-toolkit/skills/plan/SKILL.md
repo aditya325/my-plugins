@@ -4,6 +4,7 @@ description: >
   Create a detailed technical specification for a feature. Produces per-file
   decisions (settings, classes, tokens, structure) so /execute has zero
   creative decisions. Use after /clarify when requirements are confirmed.
+disable-model-invocation: true
 allowed-tools: Read, Write, Grep, Glob, Agent, AskUserQuestion
 ---
 
