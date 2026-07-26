@@ -4,7 +4,6 @@ description: >
   Assess built features with first-principles thinking. Checks requirements
   coverage, standards compliance, integration correctness, and edge cases.
   Reports findings and stops — no auto-fix. Use after /execute.
-disable-model-invocation: true
 context: fork
 allowed-tools: Read, Write, Grep, Glob, Bash, Agent
 ---
