@@ -5,7 +5,7 @@ description: >
   Captures layout, typography, colors, spacing, and screenshots.
   Use as the first step when building from a Figma design.
 disable-model-invocation: true
-allowed-tools: Read, Write, Glob, Grep, Bash, AskUserQuestion, mcp__claude_ai_Figma__get_design_context, mcp__claude_ai_Figma__get_screenshot, mcp__claude_ai_Figma__get_metadata, mcp__claude_ai_Figma__get_variable_defs
+allowed-tools: Read, Write, Glob, Grep, Bash, AskUserQuestion, mcp__figma__get_design_context, mcp__figma__get_screenshot, mcp__figma__get_metadata, mcp__figma__get_variable_defs
 ---
 
 # Figma — Design Context Extraction

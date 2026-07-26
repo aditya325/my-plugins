@@ -11,13 +11,13 @@ A Claude Code plugin for orchestrated Shopify theme development. Supports featur
 Inside Claude Code, run:
 
 ```
-/plugin marketplace add aditya325/my-plugins
+/plugin marketplace add shopify-claude-devx/shopify-standards-marketplace
 ```
 
 ### Step 2: Install the Plugin
 
 ```
-/plugin install shopify-theme-toolkit@my-plugins
+/plugin install shopify-theme-toolkit@shopify-standards
 ```
 
 ### Step 3: Verify
@@ -29,34 +29,33 @@ Restart Claude Code and type `/shopify-theme-toolkit:clarify` — if it responds
 ### Full Pipeline (Feature Development)
 
 ```
-/figma → /clarify → /plan → /execute → /compare → /assess → /fix (if needed)
+/clickup → /figma → /clarify → /plan → /execute → /compare → /assess → /fix (if needed)
 ```
 
-Start with `/figma` when building from a Figma design. Skip it if working from text requirements only.
-
-`/assess` automatically runs Playwright-based runtime tests (section rendering, JS errors, accessibility, setting wiring) when `shopify theme dev` is running.
+Start with `/clickup` when work originates from a ClickUp task (it ingests the task and routes to /clarify or /fix). Start with `/figma` when building from a Figma design. Skip both if working from text requirements only.
 
 ### Standalone Commands
 
 ```
-/figma         — Extract design context from Figma (via MCP)
-/fix           — Bug fixing with first-principles Root Cause Analysis
-/assess        — First-principles verification against requirements and standards
-/runtime-test  — Playwright runtime tests (also dispatched by /assess)
-/compare       — Visual comparison of code vs Figma screenshots
-/research      — Shopify topic research
-/understand    — Deep code explanation
+/clickup     : Ingest a ClickUp task (title, description, mockups, comments, subtasks) OR act on one (add comment, change status, log time) via MCP
+/figma       — Extract design context from Figma (via MCP)
+/fix         — Bug fixing with first-principles Root Cause Analysis
+/assess      — First-principles verification against requirements and standards
+/compare     — Visual comparison of code vs Figma screenshots
+/research    — Shopify topic research
+/understand  — Deep code explanation
 ```
 
 ### Use Cases
 
 | Use Case | Entry Point | Flow |
 |----------|-------------|------|
+| ClickUp → Feature | `/clickup` | /clickup → /clarify → /plan → /execute → /assess |
+| ClickUp → Bug | `/clickup` | /clickup → /fix → /assess |
 | Figma → Feature | `/figma` | /figma → /clarify → /plan → /execute → /compare → /assess → /fix |
 | Feature Development | `/clarify` | /clarify → /plan → /execute → /assess → /fix |
 | Bug Fixing | `/fix` | standalone with first-principles RCA |
-| Assessment | `/assess` | standalone or after /execute (includes runtime tests) |
-| Runtime Testing | `/runtime-test` | standalone or auto-dispatched by /assess |
+| Assessment | `/assess` | standalone or after /execute |
 | Visual Comparison | `/compare` | after /execute when Figma screenshots exist |
 | Research | `/research` | standalone web search |
 | Understand Code | `/understand` | standalone deep trace |
@@ -67,13 +66,13 @@ Start with `/figma` when building from a Figma design. Skip it if working from t
 
 | Skill | Purpose | Input Artifact | Output Artifact |
 |-------|---------|----------------|-----------------|
+| `/clickup` | Ingest a ClickUp task (route to /clarify or /fix), or act on one (comment, status, time) via MCP | ClickUp task ID / URL, or an instruction | `clickup-context.md` + `clickup-images/` (ingest), or a ClickUp write (action) |
 | `/figma` | Extract design context from Figma via MCP | Figma URL(s) | `design-context.md` + screenshots |
 | `/clarify` | Define requirements, research, challenge user | User request | `clarify.md` |
 | `/plan` | Technical specification with per-file decisions | `clarify.md` | `plan.md` |
 | `/execute` | Build all files in-context with full visibility | `plan.md` | code files + `execution-log.md` |
 | `/compare` | Visual comparison of code vs Figma screenshots | `selectors.json` + Figma screenshots | `comparison-report.md` |
-| `/assess` | First-principles verification (requirements + standards + integration + runtime) | `execution-log.md` + `clarify.md` | `assessment-report.md` |
-| `/runtime-test` | Playwright runtime tests — DOM rendering, JS errors, accessibility, setting wiring | `execution-log.md` + `selectors.json` | `runtime-test-results.md` |
+| `/assess` | First-principles verification (requirements + standards + integration) | `execution-log.md` + `clarify.md` | `assessment-report.md` |
 | `/fix` | First-principles RCA + fix all instances (waits for approval) | `assessment-report.md` or bug report | `fix-log.md` |
 | `/understand` | Deep code explanation | file/section/feature name | conversation output |
 | `/research` | Shopify topic research | topic query | conversation output |
@@ -106,14 +105,13 @@ Start with `/figma` when building from a Figma design. Skip it if working from t
 .buildspace/
   artifacts/
     {feature-name}/
+      clickup-context.md     <- /clickup output (task title, description, comments, subtasks)
+      clickup-images/        <- /clickup output (downloaded mockups from the task)
       design-context.md      <- /figma output (structured design specs)
       clarify.md             <- /clarify output
       plan.md                <- /plan output
       execution-log.md       <- /execute output
       selectors.json         <- /execute output (section->CSS selector map)
-      runtime-tests.spec.js  <- /runtime-test output (Playwright test script)
-      playwright.config.js   <- /runtime-test output (Playwright config)
-      runtime-test-results.md <- /runtime-test output
       screenshots/           <- /figma + /compare output
         figma-{section}-desktop.png
         figma-{section}-mobile.png
@@ -179,9 +177,8 @@ Requires Shopify CLI installed (`npm install -g @shopify/cli`).
 | What | Required? | Install |
 |---|---|---|
 | Claude Code | Yes | `npm install -g @anthropic-ai/claude-code` |
+| ClickUp MCP Server | For /clickup skill | Connect ClickUp via your Claude integrations / `claude mcp add` |
 | Figma MCP Server | For /figma skill | `claude mcp add --transport http figma https://mcp.figma.com/mcp` |
 | Figma Pro+ plan | For /figma skill | Free plan = 6 calls/month; Pro = 200/day |
 | Shopify CLI | For theme check hook | `npm install -g @shopify/cli` |
 | Node.js 18+ | For screenshot capture | nodejs.org |
-| Playwright | For /runtime-test | Auto-installed by the skill if missing |
-| shopify theme dev | For /runtime-test | Must be running during runtime tests |
